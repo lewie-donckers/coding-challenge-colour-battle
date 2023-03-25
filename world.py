@@ -69,7 +69,8 @@ class World:
 
     def step(self, measure_time=False) -> bool:
         # Update game info
-        self.game_info.current_round += 1
+        self.current_round += 1
+        self.game_info.current_round = self.current_round
 
         # Create enemies list
         enemies = [{"id": bot.id, "position": bot.position} for bot in self.bots]
