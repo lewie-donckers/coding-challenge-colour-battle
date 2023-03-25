@@ -12,7 +12,7 @@ parser.add_argument('--rounds', type=int, default=2000,
                     help='number of rounds in a single game')
 parser.add_argument('--games', type=int, default=200,
                     help='number of games to play')
-parser.add_argument('--threads', type=int, default=5,
+parser.add_argument('--threads', type=int, default=10,
                     help='number of games to run simultaniously')
 parser.add_argument('--graph', action='store_true',
                     help='Shows a histogram of the bots performance')
@@ -79,9 +79,10 @@ def progress_printer():
                 time_remaining = math.inf 
             else:  
                 time_remaining = round(rounds_left / average_rounds_per_update * update_period)
+            rounds_per_second = round(average_rounds_per_update / update_period)
 
             # Print the information
-            print(f"{'Game':>5} | {round(total_completion,1)}% | Left: {len(games_left)} / {n_games} |  Est. Time Left: {time_remaining} seconds")
+            print(f"{'Game':>5} | Left: {len(games_left)} / {n_games} ({round(total_completion,1)}%) | Speed: {rounds_per_second} rounds/s | Est. Time Left: {time_remaining} seconds")
             for game, completion in progress_.items():
                 bar_length = 40
                 filledLength = math.ceil(completion * bar_length)
