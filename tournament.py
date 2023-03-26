@@ -39,10 +39,11 @@ progress = { }
 def progress_printer():
     games_left = {game: True for game in range(n_games)}
     busy = False
-
     time_started = time.time()
+    update_period = 1 # seconds
+
     total_rounds = n_games * n_rounds
-    update_period = 1
+    time_last = time_started
     average_bucket = 20
     average_rounds_per_update = 0
     last_rounds_left = total_rounds
@@ -68,6 +69,10 @@ def progress_printer():
             total_completion = (total_rounds-rounds_left)*100/total_rounds
 
             # Calculate some kind of estimated time left
+            time_now = time.time()
+            time_delta = time_now - time_last
+            time_last = time_now
+
             rounds_completed = last_rounds_left - rounds_left
             if average_rounds_per_update == 0:
                 average_rounds_per_update = rounds_completed
@@ -75,11 +80,11 @@ def progress_printer():
                 average_rounds_per_update -= average_rounds_per_update / average_bucket
                 average_rounds_per_update += rounds_completed / average_bucket
             last_rounds_left = rounds_left
-            if average_rounds_per_update == 0:
-                time_remaining = math.inf 
-            else:  
-                time_remaining = round(rounds_left / average_rounds_per_update * update_period)
-            rounds_per_second = round(average_rounds_per_update / update_period)
+            rounds_per_second = round(average_rounds_per_update / time_delta)
+            if rounds_per_second >= 1:
+                time_remaining = round(rounds_left / rounds_per_second)
+            else:
+                time_remaining = math.inf
 
             # Print the information
             print(f"{'Game':>5} | Left: {len(games_left)} / {n_games} ({round(total_completion,1)}%) | Speed: {rounds_per_second} rounds/s | Est. Time Left: {time_remaining} seconds")
@@ -153,8 +158,7 @@ def game_runner(game):
 with concurrent.futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
     future_game = {executor.submit(game_runner, game): game for game in range(n_games)}
     for future in concurrent.futures.as_completed(future_game):
-        result = future_game[future]
-        future.result()
+        pass
 
 # Wait for progress printer thread to finish
 progress_printer_thread.join()
