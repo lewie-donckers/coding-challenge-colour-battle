@@ -3,9 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from robots.bot_list import BotList
 from world import World
-import os, time, math, sys, atexit
+import time, math
 import threading
-import concurrent.futures, multiprocessing
+import concurrent.futures
 
 parser = argparse.ArgumentParser(description='Nobleo Colour Run')
 parser.add_argument('--rounds', type=int, default=2000,
@@ -48,7 +48,7 @@ def progress_printer():
     average_rounds_per_update = 0
     last_rounds_left = total_rounds
     while busy or len(games_left) != 0:
-        os.system('clear')
+        print("\033[H\033[J", end="") # Clear console
 
         progress_lock.acquire()
         progress_ = progress.copy()
@@ -94,7 +94,7 @@ def progress_printer():
                 bar = '*' * filledLength + '-' * (bar_length - filledLength)
                 print(f'{game:>5} |{bar}| {round(completion * 100, 1)}%')
         time.sleep(update_period)
-    os.system('clear')
+    print("\033[H\033[J", end="") # Clear console
     print(f"Tournament finished in {round(time.time() - time_started)} seconds")
 progress_printer_thread = threading.Thread(target=progress_printer, daemon=True)
 progress_printer_thread.start()
